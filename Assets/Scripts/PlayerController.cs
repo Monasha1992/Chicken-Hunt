@@ -3,11 +3,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private readonly float _speed = 20.0f;
+    private readonly float _speed = 6.0f;
     private readonly float _turnSpeed = 25.0f;
     private float _forwardInput;
     private float _horizontalInput;
 
+    // Update is called once per frame
     private void Update()
     {
         // Get player inputs

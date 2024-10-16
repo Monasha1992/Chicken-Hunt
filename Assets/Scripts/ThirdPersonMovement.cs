@@ -6,6 +6,7 @@ using UnityEngine;
 public class ThirdPersonMovement : MonoBehaviour
 {
     private CharacterController _controller;
+    private Rigidbody _rb;
     private Transform _camera;
 
     public float speed = 6f;
@@ -16,6 +17,7 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>().transform;
         _controller = GetComponent<CharacterController>();
+        _rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -32,9 +34,12 @@ public class ThirdPersonMovement : MonoBehaviour
             var rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref _smoothVelocity,
                 _smoothTime);
             transform.rotation = Quaternion.Euler(0, rotation, 0);
+            // var newRotation = Quaternion.Euler(0, rotation, 0);
 
             var moveDirection = Quaternion.Euler(0, targetRotation, 0) * Vector3.forward;
+            Debug.Log($" y => {direction.y}");
             _controller.Move(moveDirection.normalized * (speed * Time.deltaTime));
+            // _rb.Move(moveDirection.normalized * (speed * Time.deltaTime), transform.rotation);
         }
     }
 }
