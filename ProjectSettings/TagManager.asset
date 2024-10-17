@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Fence
+  - Dog
   layers:
   - Default
   - TransparentFX
