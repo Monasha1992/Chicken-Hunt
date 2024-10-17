@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 
 public class ChickenRoam : MonoBehaviour
 {
@@ -9,10 +11,11 @@ public class ChickenRoam : MonoBehaviour
     [SerializeField] private LayerMask groundLayer, playerLayer;
 
     // Patrol
-    [SerializeField] private Vector3 destination;
+    private Vector3 _destination;
     private GameObject _area;
     private Bounds _bounds;
     private bool _isWalkPointSet;
+    private bool _isEating;
 
     // Start is called before the first frame update
     void Start()
@@ -38,27 +41,40 @@ public class ChickenRoam : MonoBehaviour
         }
         else
         {
-            _agent.SetDestination(destination);
+            _agent.SetDestination(_destination);
         }
 
-        if (Vector3.Distance(transform.position, destination) < 1)
+        if (Vector3.Distance(transform.position, _destination) < 1)
         {
-            _isWalkPointSet = false;
+            StartCoroutine(Eating());
         }
+    }
+
+    private IEnumerator Eating()
+    {
+        if (_isEating) yield break;
+
+        Debug.Log($"isWalkPointSet -{_isWalkPointSet} - Stared eating");
+        // TODO: Play eating animation
+        _isEating = true;
+        yield return new WaitForSeconds(30);
+
+        // Clear walkPoint after waiting
+        Debug.Log($"isWalkPointSet -{_isWalkPointSet} - Finished eating");
+        // TODO: Play idle animation
+        _isWalkPointSet = false;
+        _isEating = false;
     }
 
     private void SearchForDestination()
     {
-        // var z = Random.Range(-walkRangeZ, walkRangeZ);
-        // var x = Random.Range(-walkRangeX, walkRangeX);
-
         var randomPoint = GetRandomPoint();
-        // destination = new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
-        destination = new Vector3(randomPoint.x, transform.position.y, randomPoint.z);
+        _destination = new Vector3(randomPoint.x, 0, randomPoint.z);
 
-        if (Physics.Raycast(destination, Vector3.down, groundLayer))
+        if (Physics.Raycast(_destination, Vector3.down, groundLayer))
         {
             _isWalkPointSet = true;
+            // TODO: Play walking animation
         }
     }
 

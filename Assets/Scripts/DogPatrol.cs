@@ -1,28 +1,35 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class DogPatrol : MonoBehaviour
 {
-    private GameObject _player;
+    // private GameObject _player;
     private NavMeshAgent _agent;
 
     [SerializeField] private LayerMask groundLayer, playerLayer;
 
     // Patrol
-    [SerializeField] private Vector3 destination;
+    private Vector3 _destination;
     private bool _isWalkPointSet;
 
-    private GameObject _area;
+    private readonly GameObject[] _areas = new GameObject[3];
+    private int _lastAreaIndex = 2;
 
-    private Bounds _bounds;
+    private readonly Bounds[] _bounds = new Bounds[3];
 
     // Start is called before the first frame update
     void Start()
     {
-        _area = GameObject.Find("Farm Dog Patrol Area");
+        for (var i = 0; i < _areas.Length; i++)
+        {
+            var area = GameObject.Find($"Dog Patrol Area {i + 1}");
+            _areas[i] = (area);
+            _bounds[i] = GetGroundBounds(area);
+        }
+
         _agent = GetComponent<NavMeshAgent>();
-        _player = GameObject.Find("Third Person Player");
-        _bounds = GetGroundBounds();
+        // _player = GameObject.Find("Third Person Player");
     }
 
 
@@ -40,10 +47,10 @@ public class DogPatrol : MonoBehaviour
         }
         else
         {
-            _agent.SetDestination(destination);
+            _agent.SetDestination(_destination);
         }
 
-        if (Vector3.Distance(transform.position, destination) < 1)
+        if (Vector3.Distance(transform.position, _destination) < 5)
         {
             _isWalkPointSet = false;
         }
@@ -56,9 +63,9 @@ public class DogPatrol : MonoBehaviour
 
         var randomPoint = GetRandomPoint();
         // destination = new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
-        destination = new Vector3(randomPoint.x, transform.position.y, randomPoint.z);
+        _destination = new Vector3(randomPoint.x, 0, randomPoint.z);
 
-        if (Physics.Raycast(destination, Vector3.down, groundLayer))
+        if (Physics.Raycast(_destination, Vector3.down, groundLayer))
         {
             _isWalkPointSet = true;
         }
@@ -66,23 +73,62 @@ public class DogPatrol : MonoBehaviour
 
     private Vector3 GetRandomPoint()
     {
+        Bounds bounds;
+        // get the next bound according to the current bound
+        switch (_lastAreaIndex)
+        {
+            case 0:
+            {
+                int[] accessibleAreasIndexes = { 0, 1 };
+                var randomIndex = Random.Range(0, 2);
+                var index = accessibleAreasIndexes[randomIndex];
+                bounds = _bounds[index];
+                _lastAreaIndex = index;
+                break;
+            }
+            case 1:
+            {
+                int[] accessibleAreasIndexes = { 0, 1, 2 };
+                var randomIndex = Random.Range(0, 3);
+                var index = accessibleAreasIndexes[randomIndex];
+                bounds = _bounds[index];
+                _lastAreaIndex = index;
+                break;
+            }
+            case 2:
+            {
+                int[] accessibleAreasIndexes = { 1, 2 };
+                var randomIndex = Random.Range(0, 2);
+                var index = accessibleAreasIndexes[randomIndex];
+                bounds = _bounds[index];
+                _lastAreaIndex = index;
+                break;
+            }
+            default:
+            {
+                bounds = _bounds.Last();
+                _lastAreaIndex = 2;
+                break;
+            }
+        }
+
         // Generate a random point within the bounds
-        var randomX = Random.Range(_bounds.min.x, _bounds.max.x);
+        var randomX = Random.Range(bounds.min.x, bounds.max.x);
         // var randomY = Random.Range(_bounds.min.y, _bounds.max.y);
-        var randomZ = Random.Range(_bounds.min.z, _bounds.max.z);
+        var randomZ = Random.Range(bounds.min.z, bounds.max.z);
 
         return new Vector3(randomX, transform.position.y, randomZ);
     }
 
-    private Bounds GetGroundBounds()
+    private Bounds GetGroundBounds(GameObject area)
     {
         // Get the bounds of the GameObject
-        if (_area.TryGetComponent<Collider>(out var childCollider))
+        if (area.TryGetComponent<Collider>(out var childCollider))
         {
             return childCollider.bounds;
         }
 
-        if (_area.TryGetComponent<Renderer>(out var childRenderer))
+        if (area.TryGetComponent<Renderer>(out var childRenderer))
         {
             return childRenderer.bounds;
         }
