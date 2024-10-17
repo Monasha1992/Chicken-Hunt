@@ -6,7 +6,6 @@ using UnityEngine;
 public class ThirdPersonMovement : MonoBehaviour
 {
     private CharacterController _controller;
-    private Rigidbody _rb;
     private Transform _camera;
 
     public float speed = 6f;
@@ -24,57 +23,54 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>().transform;
         _controller = GetComponent<CharacterController>();
-        _rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        // var horizontal = Input.GetAxis("Horizontal");
-        // var vertical = Input.GetAxis("Vertical");
-        //
-        // var direction = new Vector3(horizontal, 0, vertical).normalized;
-        //
-        // if (direction.magnitude >= 0.1f)
-        // {
-        //     var targetRotation = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
-        //     var rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref _smoothVelocity,
-        //         _smoothTime);
-        //     transform.rotation = Quaternion.Euler(0, rotation, 0);
-        //     // var newRotation = Quaternion.Euler(0, rotation, 0);
-        //
-        //     var moveDirection = Quaternion.Euler(0, targetRotation, 0) * Vector3.forward;
-        //     Debug.Log($" y => {direction.y}");
-        //     _controller.Move(moveDirection.normalized * (speed * Time.deltaTime));
-        //     // _rb.Move(moveDirection.normalized * (speed * Time.deltaTime), transform.rotation);
-        // }
-
-        groundedPlayer = _controller.isGrounded;
-        if (groundedPlayer && playerVelocity.y < 0)
-        {
-            playerVelocity.y = 0f;
-        }
-
-        var move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        _controller.Move(move * (Time.deltaTime * playerSpeed));
-
-        if (move != Vector3.zero)
-        {
-            gameObject.transform.forward = move;
-        }
-
-        // Changes the height position of the player
-        if (Input.GetButtonDown("Jump") && groundedPlayer)
-        {
-            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
-        }
-
-        playerVelocity.y += gravityValue * Time.deltaTime;
+        var horizontal = Input.GetAxis("Horizontal");
+        var vertical = Input.GetAxis("Vertical");
         
-        // var targetRotation = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
-        // var rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref _smoothVelocity,
-        //     _smoothTime);
-        // transform.rotation = Quaternion.Euler(0, rotation, 0);
-        _controller.Move(playerVelocity * Time.deltaTime);
+        var direction = new Vector3(horizontal, 0, vertical).normalized;
+        
+        if (direction.magnitude >= 0.1f)
+        {
+            var targetRotation = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
+            var rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref _smoothVelocity,
+                _smoothTime);
+            transform.rotation = Quaternion.Euler(0, rotation, 0);
+            // var newRotation = Quaternion.Euler(0, rotation, 0);
+        
+            var moveDirection = Quaternion.Euler(0, targetRotation, 0) * Vector3.forward;
+            _controller.Move(moveDirection.normalized * (speed * Time.deltaTime));
+        }
+
+        // groundedPlayer = _controller.isGrounded;
+        // if (groundedPlayer && playerVelocity.y < 0)
+        // {
+        //     playerVelocity.y = 0f;
+        // }
+        //
+        // var move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        // _controller.Move(move * (Time.deltaTime * playerSpeed));
+        //
+        // if (move != Vector3.zero)
+        // {
+        //     gameObject.transform.forward = move;
+        // }
+        //
+        // // Changes the height position of the player
+        // if (Input.GetButtonDown("Jump") && groundedPlayer)
+        // {
+        //     playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+        // }
+        //
+        // playerVelocity.y += gravityValue * Time.deltaTime;
+        //
+        // // var targetRotation = Mathf.Atan2(move.x, move.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
+        // // var rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref _smoothVelocity,
+        // //     _smoothTime);
+        // // transform.rotation = Quaternion.Euler(0, rotation, 0);
+        // _controller.Move(playerVelocity * Time.deltaTime);
     }
 }
