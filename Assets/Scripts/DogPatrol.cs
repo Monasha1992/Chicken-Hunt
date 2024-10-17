@@ -1,13 +1,15 @@
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class DogPatrol : MonoBehaviour
 {
-    // private GameObject _player;
+    private GameObject _player;
     private NavMeshAgent _agent;
 
-    [SerializeField] private LayerMask groundLayer, playerLayer;
+    [SerializeField] private LayerMask groundLayer;
 
     // Patrol
     private Vector3 _destination;
@@ -18,25 +20,35 @@ public class DogPatrol : MonoBehaviour
 
     private readonly Bounds[] _bounds = new Bounds[3];
 
+    private FieldOfView _fov;
+
     // Start is called before the first frame update
     void Start()
     {
+        _agent = GetComponent<NavMeshAgent>();
+        _fov = GetComponent<FieldOfView>();
+        _player = GameObject.Find("Third Person Player");
+
         for (var i = 0; i < _areas.Length; i++)
         {
             var area = GameObject.Find($"Dog Patrol Area {i + 1}");
-            _areas[i] = (area);
+            _areas[i] = area;
             _bounds[i] = GetGroundBounds(area);
         }
-
-        _agent = GetComponent<NavMeshAgent>();
-        // _player = GameObject.Find("Third Person Player");
     }
 
 
     // Update is called once per frame
     private void Update()
     {
-        Patrol();
+        if (_fov.canSeePlayer) ChasePlayer();
+        else Patrol();
+    }
+
+
+    private void ChasePlayer()
+    {
+        _agent.SetDestination(_player.transform.position);
     }
 
     private void Patrol()
