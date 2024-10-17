@@ -11,6 +11,16 @@ public class GameManager : MonoBehaviour
     public bool isGameOver;
     public bool isChickenScreaming;
 
+    private GameObject _gameOverScreen;
+    private GameObject _winnerScreen;
+
+    private void Start()
+    {
+        _gameOverScreen = GameObject.Find("Game Over");
+        _winnerScreen = GameObject.Find("Winner");
+        _gameOverScreen.SetActive(false);
+        _winnerScreen.SetActive(false);
+    }
 
     private void Update()
     {
@@ -18,6 +28,7 @@ public class GameManager : MonoBehaviour
         {
             // TODO: play dying animation
             isGameOver = true;
+            _gameOverScreen.SetActive(true);
         }
     }
 
@@ -32,6 +43,11 @@ public class GameManager : MonoBehaviour
         isAttacking = true;
         hasCaughtChicken = true;
         // TODO: Play chicken screaming sound 
+    }
+
+    public void ReachedJungle()
+    {
+        if (hasCaughtChicken) _winnerScreen.SetActive(true);
     }
 
     public IEnumerator Delay(float seconds)

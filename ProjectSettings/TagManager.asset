@@ -8,6 +8,7 @@ TagManager:
   - Fence
   - Dog
   - Chicken
+  - Finish Line
   layers:
   - Default
   - TransparentFX

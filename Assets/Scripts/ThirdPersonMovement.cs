@@ -96,5 +96,9 @@ public class ThirdPersonMovement : MonoBehaviour
             hit.gameObject.GetComponent<NavMeshAgent>().enabled = false;
             _gameManager.CaughtChicken();
         }
+        else if (hit.gameObject.CompareTag("Finish Line") && !_gameManager.isGameOver)
+        {
+            _gameManager.ReachedJungle();
+        }
     }
 }
