@@ -7,12 +7,7 @@ using Random = UnityEngine.Random;
 
 public class ChickenRoam : MonoBehaviour
 {
-    private GameObject _player;
-    private GameObject _foxMouth;
-    private BoxCollider _collider;
-    private Rigidbody _rigidbody;
-
-    [SerializeField] private bool hasCaught;
+    private GameManager _gameManager;
 
     // Patrol
     [SerializeField] private LayerMask groundLayer, playerLayer;
@@ -28,38 +23,19 @@ public class ChickenRoam : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        _gameManager = FindObjectOfType<GameManager>();
+
         _area = GameObject.Find("Chicken Farm Walkable Area");
         _agent = GetComponent<NavMeshAgent>();
-        _collider = GetComponent<BoxCollider>();
-        _rigidbody = GetComponent<Rigidbody>();
-        _player = GameObject.Find("Third Person Player");
-        _foxMouth = GameObject.Find("Mouth");
-        mouth = _foxMouth.transform.position;
         _bounds = GetGroundBounds();
     }
 
     // Update is called once per frame
     private void Update()
     {
-        if (!hasCaught) Patrol();
+        if (!_gameManager.hasCaughtChicken) Patrol();
     }
 
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.CompareTag("Player") && !hasCaught)
-        {
-            hasCaught = true;
-
-            _agent.enabled = false;
-            _collider.enabled = false;
-            _rigidbody.useGravity = false;
-
-            var position = _foxMouth.transform.position;
-            // position.y = _foxMouth.transform.position.y;
-            transform.SetParent(_player.transform);
-            transform.SetPositionAndRotation(position, _foxMouth.transform.rotation);
-        }
-    }
 
     private void Patrol()
     {

@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public float health = 100;
+    public bool hasCaughtChicken;
     public bool isAttacking;
     public bool isGameOver;
     public bool isChickenScreaming;
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
     public void CaughtChicken()
     {
         isAttacking = true;
+        hasCaughtChicken = true;
         // TODO: Play chicken screaming sound 
     }
 

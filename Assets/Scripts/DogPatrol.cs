@@ -33,7 +33,7 @@ public class DogPatrol : MonoBehaviour
         _player = GameObject.Find("Third Person Player");
 
         _agent.speed = 2;
-        
+
         for (var i = 0; i < _areas.Length; i++)
         {
             var area = GameObject.Find($"Dog Patrol Area {i + 1}");
@@ -51,12 +51,14 @@ public class DogPatrol : MonoBehaviour
 
     private void ChasePlayer()
     {
-        _agent.speed = 6;
+        _agent.speed = 3;
         _agent.SetDestination(_player.transform.position);
     }
 
     private void Patrol()
     {
+        _agent.speed = 1;
+
         if (!_isWalkPointSet)
         {
             SearchForDestination();
@@ -157,7 +159,6 @@ public class DogPatrol : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Player") && !_isAttacking)
         {
-            Debug.Log("Attacking ---> ");
             _isAttacking = true;
             _gameManager.GotAttacked();
 
