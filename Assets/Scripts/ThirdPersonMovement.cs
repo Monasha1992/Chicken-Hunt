@@ -1,10 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
+    private GameManager _gameManager;
+
     private CharacterController _controller;
     private Transform _camera;
 
@@ -14,23 +13,24 @@ public class ThirdPersonMovement : MonoBehaviour
 
     private Vector3 _playerVelocity;
 
-    private bool _groundedPlayer;
-
     // private float _playerSpeed = 2.0f;
     private const float JumpHeight = 10f;
     private const float GravityValue = -9.81f;
 
     private void Start()
     {
+        _gameManager = FindObjectOfType<GameManager>();
         _controller = GetComponent<CharacterController>();
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>().transform;
-        _groundedPlayer = _controller.isGrounded;
     }
 
     // Update is called once per frame
     void Update()
     {
-        _groundedPlayer = _controller.isGrounded;
+        // shift to speed up
+        if (Input.GetKey(KeyCode.LeftShift)) speed = 12;
+        else speed = 6;
+
         var horizontal = Input.GetAxis("Horizontal");
         var vertical = Input.GetAxis("Vertical");
 
@@ -54,6 +54,14 @@ public class ThirdPersonMovement : MonoBehaviour
 
             // _controller.Move(_playerVelocity * Time.deltaTime);
             _controller.Move(moveDirection.normalized * (speed * Time.deltaTime));
+        }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Chicken"))
+        {
+            _gameManager.CaughtChicken();
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
@@ -6,6 +5,8 @@ using Random = UnityEngine.Random;
 
 public class DogPatrol : MonoBehaviour
 {
+    private GameManager _gameManager;
+
     private GameObject _player;
     private NavMeshAgent _agent;
 
@@ -21,14 +22,18 @@ public class DogPatrol : MonoBehaviour
     private readonly Bounds[] _bounds = new Bounds[3];
 
     private FieldOfView _fov;
+    private bool _isAttacking;
 
     // Start is called before the first frame update
     void Start()
     {
+        _gameManager = FindObjectOfType<GameManager>();
         _agent = GetComponent<NavMeshAgent>();
         _fov = GetComponent<FieldOfView>();
         _player = GameObject.Find("Third Person Player");
 
+        _agent.speed = 2;
+        
         for (var i = 0; i < _areas.Length; i++)
         {
             var area = GameObject.Find($"Dog Patrol Area {i + 1}");
@@ -37,17 +42,16 @@ public class DogPatrol : MonoBehaviour
         }
     }
 
-
     // Update is called once per frame
     private void Update()
     {
-        if (_fov.canSeePlayer) ChasePlayer();
+        if ((_fov.canSeePlayer || _gameManager.isAttacking) && !_gameManager.isGameOver) ChasePlayer();
         else Patrol();
     }
 
-
     private void ChasePlayer()
     {
+        _agent.speed = 6;
         _agent.SetDestination(_player.transform.position);
     }
 
@@ -146,5 +150,19 @@ public class DogPatrol : MonoBehaviour
         }
 
         return new Bounds();
+    }
+
+
+    private void OnCollisionStay(Collision other)
+    {
+        if (other.gameObject.CompareTag("Player") && !_isAttacking)
+        {
+            Debug.Log("Attacking ---> ");
+            _isAttacking = true;
+            _gameManager.GotAttacked();
+
+            StartCoroutine(_gameManager.Delay(0.1f));
+            _isAttacking = false;
+        }
     }
 }
