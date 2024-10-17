@@ -1175,7 +1175,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6e67d2398a5446c1bcb5c1b85c0a154, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.04
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c6e67d2398a5446c1bcb5c1b85c0a154, type: 3}
       propertyPath: m_LocalPosition.z
@@ -7877,7 +7877,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3175e5b8cb9e0445e9c2cab72d58531a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
 --- !u!114 &778582778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8418,7 +8417,7 @@ Transform:
   m_GameObject: {fileID: 1013650425}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.45, y: 0, z: -3.18}
+  m_LocalPosition: {x: 0.08, y: -0.203, z: -3.462}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -8514,6 +8513,7 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 8
+  mouth: {x: 0, y: 0, z: 0}
 --- !u!1001 &1064089957
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9189,7 +9189,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3175e5b8cb9e0445e9c2cab72d58531a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
 --- !u!143 &1446161190
 CharacterController:
   m_ObjectHideFlags: 0
