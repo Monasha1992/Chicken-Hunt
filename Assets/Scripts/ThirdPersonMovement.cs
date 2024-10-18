@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 
 public class ThirdPersonMovement : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class ThirdPersonMovement : MonoBehaviour
 
     public ParticleSystem chickenEatParticles;
     public ParticleSystem dogDieParticles;
+    
+    private AudioSource _playerAudio;
+    public AudioClip chickenCaughtSound;
 
     public float speed = 1f;
 
@@ -35,6 +39,7 @@ public class ThirdPersonMovement : MonoBehaviour
         _mouth = GameObject.Find("Mouth");
         _blood = GameObject.Find("Blood");
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>().transform;
+        _playerAudio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -143,6 +148,7 @@ public class ThirdPersonMovement : MonoBehaviour
             hit.gameObject.GetComponent<NavMeshAgent>().enabled = false;
             _gameManager.CaughtChicken();
             chickenEatParticles.Play();
+            _playerAudio.PlayOneShot(chickenCaughtSound, 1.0f);
         }
         else if (hit.gameObject.CompareTag("Finish Line") && !_gameManager.isGameOver)
         {

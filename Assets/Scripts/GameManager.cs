@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour
     public bool isGameOver = true;
     public bool gameStarted;
     public bool hasWon;
-    public bool isChickenScreaming;
 
     private GameObject _mainMenuScreen;
     private GameObject _gameOverScreen;

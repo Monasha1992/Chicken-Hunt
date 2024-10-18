@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
@@ -24,6 +25,10 @@ public class DogPatrol : MonoBehaviour
     private FieldOfView _fov;
     private bool _isAttacking;
 
+    private AudioSource _dogAudio;
+    public AudioClip dogAttackingSound;
+    private bool _isAttackingPlaying;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +36,7 @@ public class DogPatrol : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
         _fov = GetComponent<FieldOfView>();
         _player = GameObject.Find("Third Person Player");
+        _dogAudio = GetComponent<AudioSource>();
 
         _agent.speed = 2;
 
@@ -53,6 +59,7 @@ public class DogPatrol : MonoBehaviour
     {
         _agent.speed = 3;
         _agent.SetDestination(_player.transform.position);
+        if (!_isAttackingPlaying) StartCoroutine(PlayDogSound());
     }
 
     private void Patrol()
@@ -161,9 +168,16 @@ public class DogPatrol : MonoBehaviour
         {
             _isAttacking = true;
             _gameManager.GotAttacked();
-
             StartCoroutine(_gameManager.Delay(0.1f));
             _isAttacking = false;
         }
+    }
+
+    private IEnumerator PlayDogSound()
+    {
+        _isAttackingPlaying = true;
+        _dogAudio.PlayOneShot(dogAttackingSound, 1.0f);
+        yield return new WaitForSeconds(3);
+        _isAttackingPlaying = false;
     }
 }
