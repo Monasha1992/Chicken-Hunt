@@ -40,11 +40,9 @@ public class ThirdPersonMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_gameManager.isGameOver && !_isDead) Died();
-        else
-        {
-            RunSpeed();
-        }
+        if (_gameManager.isGameOver && !_isDead && !_gameManager.hasWon) Died();
+        else RunSpeed();
+
 
         MovePlayerRelativeToCamera2();
     }
@@ -52,6 +50,7 @@ public class ThirdPersonMovement : MonoBehaviour
     private void Died()
     {
         _isDead = true;
+        _gameManager.PlayerDied();
         _body.transform.position = new Vector3(_body.transform.position.x, _body.transform.position.y,
             _body.transform.position.z);
         _mouth.transform.position = new Vector3(_mouth.transform.position.x, 0, _mouth.transform.position.z);
@@ -130,7 +129,7 @@ public class ThirdPersonMovement : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, rotation, 0);
 
             var moveDirection = Quaternion.Euler(0, targetRotation, 0) * Vector3.forward;
-            _controller.Move(moveDirection.normalized * (speed * Time.deltaTime));
+            if (_gameManager.gameStarted) _controller.Move(moveDirection.normalized * (speed * Time.deltaTime));
         }
     }
 

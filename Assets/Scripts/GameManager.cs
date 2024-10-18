@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     public bool hasCaughtChicken;
     public bool isAttacking;
     public bool isGameOver = true;
+    public bool gameStarted;
     public bool hasWon;
     public bool isChickenScreaming;
 
@@ -54,13 +55,21 @@ public class GameManager : MonoBehaviour
             var particles = GameObject.FindGameObjectsWithTag("Confetti");
             foreach (var particle in particles) particle.GetComponent<ParticleSystem>().Play();
             _winnerScreen.SetActive(true);
+            gameStarted = false;
             hasWon = true;
             isGameOver = true;
         }
     }
 
+    public void PlayerDied()
+    {
+        gameStarted = false;
+    }
+
     public void StartGame()
     {
+        hasWon = false;
+        gameStarted = true;
         isGameOver = false;
         _mainMenuScreen.SetActive(false);
         _gameOverScreen.SetActive(false);
