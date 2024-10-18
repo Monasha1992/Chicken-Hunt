@@ -17,7 +17,7 @@ public class DogPatrol : MonoBehaviour
     private bool _isWalkPointSet;
 
     private readonly GameObject[] _areas = new GameObject[3];
-    private int _lastAreaIndex = 2;
+    public int lastAreaIndex = 2;
 
     private readonly Bounds[] _bounds = new Bounds[3];
 
@@ -93,7 +93,7 @@ public class DogPatrol : MonoBehaviour
     {
         Bounds bounds;
         // get the next bound according to the current bound
-        switch (_lastAreaIndex)
+        switch (lastAreaIndex)
         {
             case 0:
             {
@@ -101,7 +101,7 @@ public class DogPatrol : MonoBehaviour
                 var randomIndex = Random.Range(0, 2);
                 var index = accessibleAreasIndexes[randomIndex];
                 bounds = _bounds[index];
-                _lastAreaIndex = index;
+                lastAreaIndex = index;
                 break;
             }
             case 1:
@@ -110,7 +110,7 @@ public class DogPatrol : MonoBehaviour
                 var randomIndex = Random.Range(0, 3);
                 var index = accessibleAreasIndexes[randomIndex];
                 bounds = _bounds[index];
-                _lastAreaIndex = index;
+                lastAreaIndex = index;
                 break;
             }
             case 2:
@@ -119,13 +119,13 @@ public class DogPatrol : MonoBehaviour
                 var randomIndex = Random.Range(0, 2);
                 var index = accessibleAreasIndexes[randomIndex];
                 bounds = _bounds[index];
-                _lastAreaIndex = index;
+                lastAreaIndex = index;
                 break;
             }
             default:
             {
                 bounds = _bounds.Last();
-                _lastAreaIndex = 2;
+                lastAreaIndex = 2;
                 break;
             }
         }

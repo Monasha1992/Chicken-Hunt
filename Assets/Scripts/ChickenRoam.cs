@@ -18,8 +18,6 @@ public class ChickenRoam : MonoBehaviour
     private bool _isWalkPointSet;
     private bool _isEating;
 
-    public Vector3 mouth;
-
     // Start is called before the first frame update
     void Start()
     {

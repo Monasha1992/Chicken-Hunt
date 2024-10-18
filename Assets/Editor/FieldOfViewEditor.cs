@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Editor
 {
-    [CustomEditor(typeof(FieldOfView))]
+    // [CustomEditor(typeof(FieldOfView))]
     public class FieldOfViewEditor : UnityEditor.Editor
     {
         private void OnSceneGUI()
