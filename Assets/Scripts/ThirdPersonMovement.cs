@@ -9,6 +9,7 @@ public class ThirdPersonMovement : MonoBehaviour
     private Transform _camera;
     private GameObject _body;
     private GameObject _mouth;
+    private GameObject _blood;
 
     public ParticleSystem chickenEatParticles;
     public ParticleSystem dogDieParticles;
@@ -31,6 +32,7 @@ public class ThirdPersonMovement : MonoBehaviour
         _controller = GetComponent<CharacterController>();
         _body = GameObject.Find("Fox");
         _mouth = GameObject.Find("Mouth");
+        _blood = GameObject.Find("Blood");
         _camera = GameObject.Find("Main Camera").GetComponent<Camera>().transform;
     }
 
@@ -55,6 +57,7 @@ public class ThirdPersonMovement : MonoBehaviour
         _body.transform.Rotate(0, 0, 90, Space.Self);
         _mouth.transform.Rotate(0, 0, 0, Space.Self);
         dogDieParticles.Play();
+        _blood.gameObject.GetComponent<MeshRenderer>().enabled = true;
     }
 
     private void RunSpeed()
