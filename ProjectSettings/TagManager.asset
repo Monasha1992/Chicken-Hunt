@@ -9,6 +9,7 @@ TagManager:
   - Dog
   - Chicken
   - Finish Line
+  - Confetti
   layers:
   - Default
   - TransparentFX
