@@ -10,6 +10,7 @@
   </a>
 
 <h3 align="center">Chicken Hunt</h3>
+<h4 align="center">V1.0</h4>
 
   <p align="center">
     Fox hunting chickens while staying away from the dogs.
