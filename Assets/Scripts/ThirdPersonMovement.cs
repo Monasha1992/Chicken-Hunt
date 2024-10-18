@@ -15,7 +15,8 @@ public class ThirdPersonMovement : MonoBehaviour
     public ParticleSystem dogDieParticles;
 
     public float speed = 1f;
-    public bool isSpeedLocked;
+
+    // public bool isSpeedLocked;
     private const float SmoothTime = 0.1f;
     private float _smoothVelocity;
     private bool _isDead;
@@ -77,33 +78,35 @@ public class ThirdPersonMovement : MonoBehaviour
             //     // isSpeedLocked = false;
             // }
             speed = 6;
-            Debug.Log("Running");
+            // Debug.Log("Running");
         }
         else
         {
             speed = 1;
-            Debug.Log("Stopped");
+            // Debug.Log("Stopped");
         }
     }
 
-    private void MovePlayerRelativeToCamera()
-    {
-        var horizontal = Input.GetAxis("Horizontal");
-        var vertical = Input.GetAxis("Vertical");
-
-        var forward = Camera.main.transform.forward;
-        var right = Camera.main.transform.right;
-        forward.y = 0;
-        right.y = 0;
-        forward.Normalize();
-        right.Normalize();
-
-        var forwardRelativeVerticalInput = vertical * forward;
-        var rightRelativeHorizontalInput = horizontal * right;
-
-        var cameraRelativeMovement = forwardRelativeVerticalInput + rightRelativeHorizontalInput;
-        transform.Translate(cameraRelativeMovement * (speed * Time.deltaTime), Space.World);
-    }
+    // private void MovePlayerRelativeToCamera()
+    // {
+    //     var horizontal = Input.GetAxis("Horizontal");
+    //     var vertical = Input.GetAxis("Vertical");
+    //
+    //     if (Camera.main == null) return;
+    //
+    //     var forward = Camera.main.transform.forward;
+    //     var right = Camera.main.transform.right;
+    //     forward.y = 0;
+    //     right.y = 0;
+    //     forward.Normalize();
+    //     right.Normalize();
+    //
+    //     var forwardRelativeVerticalInput = vertical * forward;
+    //     var rightRelativeHorizontalInput = horizontal * right;
+    //
+    //     var cameraRelativeMovement = forwardRelativeVerticalInput + rightRelativeHorizontalInput;
+    //     transform.Translate(cameraRelativeMovement * (speed * Time.deltaTime), Space.World);
+    // }
 
     private void MovePlayerRelativeToCamera2()
     {
