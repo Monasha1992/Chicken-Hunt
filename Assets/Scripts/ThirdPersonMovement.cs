@@ -30,10 +30,11 @@ public class ThirdPersonMovement : MonoBehaviour
     private float _smoothVelocity;
     private bool _isDead;
 
-    private float _gravity = -9.81f;
-    private float _gravityMultiplyer = 3;
+    private const float Gravity = -9.81f;
+    private const float GravityMultiplier = 1;
     private float _velocity;
 
+    private const float JumpPower = 4;
 
     private Vector3 _playerVelocity;
 
@@ -65,6 +66,14 @@ public class ThirdPersonMovement : MonoBehaviour
     {
         _input = context.ReadValue<Vector2>();
         _direction = new Vector3(_input.x, 0, _input.y);
+    }
+
+    public void Jump(InputAction.CallbackContext context)
+    {
+        if (context.performed) return;
+        if (!_controller.isGrounded) return;
+
+        _velocity += JumpPower;
     }
 
     private void Died()
@@ -155,7 +164,7 @@ public class ThirdPersonMovement : MonoBehaviour
         }
         else
         {
-            _velocity += _gravity * _gravityMultiplyer * Time.deltaTime;
+            _velocity += Gravity * GravityMultiplier * Time.deltaTime;
         }
 
         _direction.y = _velocity;
