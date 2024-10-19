@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
-using UnityEngine.Serialization;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(CharacterController))]
@@ -9,7 +8,9 @@ public class ThirdPersonMovement : MonoBehaviour
 {
     private GameManager _gameManager;
 
+    private Vector3 _direction;
     private CharacterController _controller;
+
     private Transform _camera;
     private GameObject _body;
     private GameObject _mouth;
@@ -21,26 +22,15 @@ public class ThirdPersonMovement : MonoBehaviour
     private AudioSource _playerAudio;
     public AudioClip chickenCaughtSound;
 
-    public Vector2 _input;
-    public Vector3 _direction;
-    public float speed = 1f;
-
-    // public bool isSpeedLocked;
     private const float SmoothTime = 0.1f;
-    private float _smoothVelocity;
-    private bool _isDead;
-
     private const float Gravity = -9.81f;
-    private const float GravityMultiplier = 1;
+    public float GravityMultiplier = 1.2f;
+    public float JumpPower = 4;
+    private float _speed = 1f;
+    private float _currentVelocity;
     private float _velocity;
-
-    private const float JumpPower = 4;
-
-    private Vector3 _playerVelocity;
-
-    // private float _playerSpeed = 2.0f;
-    // private const float JumpHeight = 10f;
-    // private const float GravityValue = -9.81f;
+    private bool _isDead;
+    public bool isGrounded = true;
 
     private void Start()
     {
@@ -54,26 +44,67 @@ public class ThirdPersonMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (_gameManager.isGameOver && !_isDead && !_gameManager.hasWon) Died();
         else RunSpeed();
 
-        MovePlayerRelativeToCamera2();
+        MovePlayerRelativeToCamera();
     }
 
-    public void Move(InputAction.CallbackContext context)
+    private void MovePlayerRelativeToCamera()
     {
-        _input = context.ReadValue<Vector2>();
-        _direction = new Vector3(_input.x, 0, _input.y);
+        ApplyGravity();
+        ApplyRotation();
+        ApplyMovement();
     }
 
-    public void Jump(InputAction.CallbackContext context)
+    // apply gravity when the player is not grounded
+    private void ApplyGravity()
     {
-        if (context.performed) return;
-        if (!_controller.isGrounded) return;
+        if (isGrounded)
+        {
+            // Jump
+            if (Input.GetButtonDown("Jump"))
+            {
+                _velocity += JumpPower;
+                isGrounded = false;
+            }
 
-        _velocity += JumpPower;
+            else if (_velocity < 0) _velocity = -1;
+        }
+        else
+        {
+            _velocity += Gravity * GravityMultiplier * Time.deltaTime;
+        }
+
+        _direction.y = _velocity;
+        if (_direction.y <= 0 && !isGrounded) isGrounded = true;
+        // Debug.Log($" {isGrounded} -- {_velocity}");
+    }
+
+    private void ApplyRotation()
+    {
+        var vertical = Input.GetAxisRaw("Vertical");
+        var horizontal = Input.GetAxisRaw("Horizontal");
+
+        var direction = new Vector3(horizontal, 0, vertical).normalized;
+        if (!(direction.magnitude >= 0.1f)) return;
+
+        var targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
+        var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _currentVelocity,
+            SmoothTime);
+
+        transform.rotation = Quaternion.Euler(0, angle, 0);
+        // var moveDir = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
+        // _direction = moveDir;
+        _direction = direction;
+    }
+
+    // Move player
+    private void ApplyMovement()
+    {
+        if (_gameManager.gameStarted) _controller.Move(_direction.normalized * (_speed * Time.deltaTime));
     }
 
     private void Died()
@@ -92,99 +123,7 @@ public class ThirdPersonMovement : MonoBehaviour
     private void RunSpeed()
     {
         // shift to increase speed upto 6 when shift is pressed
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            // if (speed < 6f)
-            // {
-            //     if (isSpeedLocked) return;
-            //
-            //     isSpeedLocked = true;
-            //     speed += 0.5f;
-            //     Debug.Log($"isSpeedLocked 1 -> {isSpeedLocked}");
-            //     StartCoroutine(_gameManager.Delay(5f));
-            //     Debug.Log($"isSpeedLocked 2 -> {isSpeedLocked}");
-            //     // isSpeedLocked = false;
-            // }
-            speed = 6;
-            // Debug.Log("Running");
-        }
-        else
-        {
-            speed = 1;
-            // Debug.Log("Stopped");
-        }
-    }
-
-    private void MovePlayerRelativeToCamera()
-    {
-        var horizontal = Input.GetAxis("Horizontal");
-        var vertical = Input.GetAxis("Vertical");
-
-        if (Camera.main == null) return;
-
-        var forward = Camera.main.transform.forward;
-        var right = Camera.main.transform.right;
-        forward.y = 0;
-        right.y = 0;
-        forward.Normalize();
-        right.Normalize();
-
-        var forwardRelativeVerticalInput = vertical * forward;
-        var rightRelativeHorizontalInput = horizontal * right;
-
-        var cameraRelativeMovement = forwardRelativeVerticalInput + rightRelativeHorizontalInput;
-        transform.Translate(cameraRelativeMovement * (speed * Time.deltaTime), Space.World);
-    }
-
-    private void MovePlayerRelativeToCamera2()
-    {
-        ApplyGravity();
-        ApplyRotation();
-        ApplyMovement();
-        // var horizontal = Input.GetAxisRaw("Horizontal");
-        // var vertical = Input.GetAxisRaw("Vertical");
-
-        // var direction = new Vector3(horizontal, 0, vertical).normalized;
-
-
-        // if (direction.y < 0) direction.y = 0f;
-        // direction.Normalize();
-        //
-        // // Changes the height position of the player
-        // if (Input.GetButtonDown("Jump")) direction.y += Mathf.Sqrt(JumpHeight * -3.0f * GravityValue);
-        // direction.y += GravityValue * Time.deltaTime;
-    }
-
-    // apply gravity when the player is not grounded
-    private void ApplyGravity()
-    {
-        if (_controller.isGrounded && _velocity < 0)
-        {
-            _velocity = -1;
-        }
-        else
-        {
-            _velocity += Gravity * GravityMultiplier * Time.deltaTime;
-        }
-
-        _direction.y = _velocity;
-    }
-
-    private void ApplyRotation()
-    {
-        if (_input.sqrMagnitude == 0) return;
-
-        var targetAngle = Mathf.Atan2(_direction.x, _direction.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
-        var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _smoothVelocity,
-            SmoothTime);
-        transform.rotation = Quaternion.Euler(0, angle, 0);
-
-        // _direction = Quaternion.Euler(0, targetRotation, 0) * Vector3.forward;
-    }
-
-    private void ApplyMovement()
-    {
-        if (_gameManager.gameStarted) _controller.Move(_direction.normalized * (speed * Time.deltaTime));
+        _speed = Input.GetKey(KeyCode.LeftShift) ? 6 : 1;
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)

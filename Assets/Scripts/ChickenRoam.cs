@@ -54,13 +54,11 @@ public class ChickenRoam : MonoBehaviour
     {
         if (_isEating) yield break;
 
-        Debug.Log($"isWalkPointSet -{_isWalkPointSet} - Stared eating");
         // TODO: Play eating animation
         _isEating = true;
         yield return new WaitForSeconds(30);
 
         // Clear walkPoint after waiting
-        Debug.Log($"isWalkPointSet -{_isWalkPointSet} - Finished eating");
         // TODO: Play idle animation
         _isWalkPointSet = false;
         _isEating = false;
