@@ -70,13 +70,13 @@ public class PlayerController : MonoBehaviour
     {
         ApplyGravity();
 
-        if (_gameManager.isGameOver && !_isDead && !_gameManager.hasWon) Died();
-
         if (!_gameManager.isGameOver)
         {
             ApplyRotation();
             ApplyMovement();
         }
+
+        if (_gameManager.isGameOver && !_isDead && !_gameManager.hasWon) Died();
     }
 
     private void ApplyGravity()
