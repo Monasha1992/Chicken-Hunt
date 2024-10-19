@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(CharacterController))]
 public class ThirdPersonMovement : MonoBehaviour
 {
     private GameManager _gameManager;
@@ -14,16 +17,23 @@ public class ThirdPersonMovement : MonoBehaviour
 
     public ParticleSystem chickenEatParticles;
     public ParticleSystem dogDieParticles;
-    
+
     private AudioSource _playerAudio;
     public AudioClip chickenCaughtSound;
 
+    public Vector2 _input;
+    public Vector3 _direction;
     public float speed = 1f;
 
     // public bool isSpeedLocked;
     private const float SmoothTime = 0.1f;
     private float _smoothVelocity;
     private bool _isDead;
+
+    private float _gravity = -9.81f;
+    private float _gravityMultiplyer = 3;
+    private float _velocity;
+
 
     private Vector3 _playerVelocity;
 
@@ -48,8 +58,13 @@ public class ThirdPersonMovement : MonoBehaviour
         if (_gameManager.isGameOver && !_isDead && !_gameManager.hasWon) Died();
         else RunSpeed();
 
-
         MovePlayerRelativeToCamera2();
+    }
+
+    public void Move(InputAction.CallbackContext context)
+    {
+        _input = context.ReadValue<Vector2>();
+        _direction = new Vector3(_input.x, 0, _input.y);
     }
 
     private void Died()
@@ -91,33 +106,37 @@ public class ThirdPersonMovement : MonoBehaviour
         }
     }
 
-    // private void MovePlayerRelativeToCamera()
-    // {
-    //     var horizontal = Input.GetAxis("Horizontal");
-    //     var vertical = Input.GetAxis("Vertical");
-    //
-    //     if (Camera.main == null) return;
-    //
-    //     var forward = Camera.main.transform.forward;
-    //     var right = Camera.main.transform.right;
-    //     forward.y = 0;
-    //     right.y = 0;
-    //     forward.Normalize();
-    //     right.Normalize();
-    //
-    //     var forwardRelativeVerticalInput = vertical * forward;
-    //     var rightRelativeHorizontalInput = horizontal * right;
-    //
-    //     var cameraRelativeMovement = forwardRelativeVerticalInput + rightRelativeHorizontalInput;
-    //     transform.Translate(cameraRelativeMovement * (speed * Time.deltaTime), Space.World);
-    // }
-
-    private void MovePlayerRelativeToCamera2()
+    private void MovePlayerRelativeToCamera()
     {
         var horizontal = Input.GetAxis("Horizontal");
         var vertical = Input.GetAxis("Vertical");
 
-        var direction = new Vector3(horizontal, 0, vertical).normalized;
+        if (Camera.main == null) return;
+
+        var forward = Camera.main.transform.forward;
+        var right = Camera.main.transform.right;
+        forward.y = 0;
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
+
+        var forwardRelativeVerticalInput = vertical * forward;
+        var rightRelativeHorizontalInput = horizontal * right;
+
+        var cameraRelativeMovement = forwardRelativeVerticalInput + rightRelativeHorizontalInput;
+        transform.Translate(cameraRelativeMovement * (speed * Time.deltaTime), Space.World);
+    }
+
+    private void MovePlayerRelativeToCamera2()
+    {
+        ApplyGravity();
+        ApplyRotation();
+        ApplyMovement();
+        // var horizontal = Input.GetAxisRaw("Horizontal");
+        // var vertical = Input.GetAxisRaw("Vertical");
+
+        // var direction = new Vector3(horizontal, 0, vertical).normalized;
+
 
         // if (direction.y < 0) direction.y = 0f;
         // direction.Normalize();
@@ -125,17 +144,38 @@ public class ThirdPersonMovement : MonoBehaviour
         // // Changes the height position of the player
         // if (Input.GetButtonDown("Jump")) direction.y += Mathf.Sqrt(JumpHeight * -3.0f * GravityValue);
         // direction.y += GravityValue * Time.deltaTime;
+    }
 
-        if (direction.magnitude >= 0.1f)
+    // apply gravity when the player is not grounded
+    private void ApplyGravity()
+    {
+        if (_controller.isGrounded && _velocity < 0)
         {
-            var targetRotation = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
-            var rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref _smoothVelocity,
-                SmoothTime);
-            transform.rotation = Quaternion.Euler(0, rotation, 0);
-
-            var moveDirection = Quaternion.Euler(0, targetRotation, 0) * Vector3.forward;
-            if (_gameManager.gameStarted) _controller.Move(moveDirection.normalized * (speed * Time.deltaTime));
+            _velocity = -1;
         }
+        else
+        {
+            _velocity += _gravity * _gravityMultiplyer * Time.deltaTime;
+        }
+
+        _direction.y = _velocity;
+    }
+
+    private void ApplyRotation()
+    {
+        if (_input.sqrMagnitude == 0) return;
+
+        var targetAngle = Mathf.Atan2(_direction.x, _direction.z) * Mathf.Rad2Deg + _camera.eulerAngles.y;
+        var angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref _smoothVelocity,
+            SmoothTime);
+        transform.rotation = Quaternion.Euler(0, angle, 0);
+
+        // _direction = Quaternion.Euler(0, targetRotation, 0) * Vector3.forward;
+    }
+
+    private void ApplyMovement()
+    {
+        if (_gameManager.gameStarted) _controller.Move(_direction.normalized * (speed * Time.deltaTime));
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
