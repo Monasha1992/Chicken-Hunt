@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public float health = 100;
     public bool hasCaughtChicken;
     public bool isAttacking;
-    public bool isGameOver = true;
+    public bool isGameOver;
     public bool gameStarted;
     public bool hasWon;
 
@@ -57,12 +57,14 @@ public class GameManager : MonoBehaviour
             gameStarted = false;
             hasWon = true;
             isGameOver = true;
+            Cursor.lockState = CursorLockMode.None;
         }
     }
 
     public void PlayerDied()
     {
         gameStarted = false;
+        Cursor.lockState = CursorLockMode.None;
     }
 
     public void StartGame()
@@ -73,6 +75,7 @@ public class GameManager : MonoBehaviour
         _mainMenuScreen.SetActive(false);
         _gameOverScreen.SetActive(false);
         _winnerScreen.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void ToMainMenu()
